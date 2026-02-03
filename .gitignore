@@ -1,9 +1,12 @@
+#Historical polar data, try integrating with API data at some point if poss
+polar_data.zip
 API_Setup.py
 
-polar_data.zip
 
+#Keeping here as was just a part of the setup. Maybe store somewhere else
 callback_server.py
 
+#Unnecessary
 testme.md
 
 #Ignoring csv file for now, will update later in development process

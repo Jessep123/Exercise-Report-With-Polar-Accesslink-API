@@ -36,21 +36,22 @@ exercise_data = requests.get(f'https://www.polaraccesslink.com/v3/exercises',
 
 #Loading data as dataframe with id column as index
 import pandas as pd
-dataframe = pd.DataFrame(exercise_data).set_index('id')
+dataframe = pd.DataFrame(exercise_data)
 
 #Path to load dataset
 data_path = r'C:\Users\jessep.LAPTOP-7GPOPVDF\Desktop\Personal Projects\polar_data.csv'
 
 #Try loading data from csv path, if it fails, create a csv
 try:
-    polar_data = pd.read_csv(data_path, index_col = 'id')
+    polar_data = pd.read_csv(data_path)
 
 except:
     print('Creating data csv')
-    dataframe.to_csv(data_path)
+    dataframe.to_csv(data_path, index = False)
+    quit()
 
 #Append any new data to the polar data csv
-polar_data = pd.concat([polar_data, dataframe])
+polar_data = pd.concat([polar_data, dataframe]).drop_duplicates(subset = ['id'])
 
 #Saving csv 
-polar_data.to_csv(data_path)
+polar_data.to_csv(data_path, index=False)
