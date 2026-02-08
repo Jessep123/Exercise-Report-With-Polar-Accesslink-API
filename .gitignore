@@ -14,3 +14,6 @@ polar_data.csv
 
 #Ignoring neon file as it is just for testing
 neon_testing.ipynb
+
+#Ignoring processing testing file as it is for testing 01_processing script code
+processing_testing.ipynb
