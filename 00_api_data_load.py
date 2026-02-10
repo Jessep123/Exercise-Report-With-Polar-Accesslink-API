@@ -10,6 +10,10 @@ To avoid this I've developed the 00_api_data_load.py script, which will pull and
 This online dataset will be updated whenever this script is run, adding new instances in
 
 For now it will just handle the loading of data, processing will be added in another file for compartmentalization
+
+Any processing/transformations will occur in 01_data_processing.py.
+
+This script just uploads and refreshes the SQL master data as is
 '''
 
 #Needed to import data from polar API
@@ -51,14 +55,18 @@ FROM polar_data
 """
 neon_data = pd.read_sql(text(query), engine)
 
+polar_data["id"] = polar_data["id"].astype(str).str.strip()
+neon_data["id"] = neon_data["id"].astype(str).str.strip()
+
 #Isolate any new rows from the polar API
 new_data = polar_data[~polar_data["id"].isin(neon_data["id"])]
 
 #Exporting data back to neon if there are new rows
 if len(new_data) != 0:
 
-    engine.dispose()  # closes old pooled connections
+    engine.dispose()  # close old pooled connections
     engine = create_engine(os.environ["NEON_DATABASE_URL"])
+
     #Converting columns to text for simplicities sake
     for col in new_data.columns:
         new_data[col] = new_data[col].where(new_data[col].isna(), new_data[col].astype(str))
@@ -72,4 +80,24 @@ if len(new_data) != 0:
         chunksize=1000,
     )
 
-print(f"Uploaded {len(new_data)} rows")
+
+#Uploading training zone metadata
+import ast
+zones = polar_data['heart_rate_zones'].apply(ast.literal_eval).loc[0]
+
+#Adding training zone column that relates to Polar info
+for item in zones:
+    item['training_zone'] = item['index'] + 1
+
+#Transforming in dataframe
+training_zone_metadata = pd.DataFrame(zones).drop('index', axis = 1)
+
+#Refreshing metadata in neon server
+training_zone_metadata.to_sql(
+        "training_zone_metadata",
+        engine,
+        if_exists="replace",
+        index=False,
+        method="multi",
+        chunksize=1000,
+    )

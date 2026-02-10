@@ -6,8 +6,6 @@ API_Setup.py
 #Keeping here as was just a part of the setup. Maybe store somewhere else
 callback_server.py
 
-#Unnecessary
-testme.md
 
 #Ignoring csv file for now, will update later in development process
 polar_data.csv
@@ -16,4 +14,6 @@ polar_data.csv
 neon_testing.ipynb
 
 #Ignoring processing testing file as it is for testing 01_processing script code
-processing_testing.ipynb
+01_processing_testing.ipynb
+
+01_processing_testing.ipynb
