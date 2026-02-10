@@ -21,7 +21,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install pandas sqlalchemy psycopg2-binary requests
+          pip install pandas sqlalchemy psycopg2-binary requests numpy
 
       - name: Run ingestion script
         env:
@@ -29,3 +29,5 @@ jobs:
           NEON_DATABASE_URL: ${{ secrets.NEON_DATABASE_URL }}
         run: |
           python 00_api_data_load.py
+          python 01_data_processing.py
+
