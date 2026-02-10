@@ -45,8 +45,11 @@ polar_data = pd.DataFrame(exercise_data)
 #Importing neon dataset
 from sqlalchemy import create_engine, text
 import psycopg2
+from sqlalchemy import text
+
 
 engine = create_engine(neon_url)
+
 
 #SQL Query
 query = """
@@ -71,33 +74,21 @@ if len(new_data) != 0:
     for col in new_data.columns:
         new_data[col] = new_data[col].where(new_data[col].isna(), new_data[col].astype(str))
         
-    new_data.to_sql(
-        "polar_data",
-        engine,
-        if_exists="append",
-        index=False,
-        method="multi",
-        chunksize=1000,
-    )
+    with engine.begin() as conn:
+        new_data.to_sql(
+            "polar_data_stage",
+            conn,
+            if_exists="replace",
+            index=False,
+            method="multi",
+            chunksize=1000,
+        )
 
+        conn.execute(text("""
+            INSERT INTO polar_data
+            SELECT *
+            FROM polar_data_stage
+            ON CONFLICT (id) DO NOTHING;
+        """))
 
-#Uploading training zone metadata
-import ast
-zones = polar_data['heart_rate_zones'].apply(ast.literal_eval).loc[0]
-
-#Adding training zone column that relates to Polar info
-for item in zones:
-    item['training_zone'] = item['index'] + 1
-
-#Transforming in dataframe
-training_zone_metadata = pd.DataFrame(zones).drop('index', axis = 1)
-
-#Refreshing metadata in neon server
-training_zone_metadata.to_sql(
-        "training_zone_metadata",
-        engine,
-        if_exists="replace",
-        index=False,
-        method="multi",
-        chunksize=1000,
-    )
+        conn.execute(text("DROP TABLE polar_data_stage;"))
