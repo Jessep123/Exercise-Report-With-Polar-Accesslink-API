@@ -30,8 +30,10 @@ exercises_header = {
   'Accept': 'application/json',  
   'Authorization': f'Bearer {access_token}'
 }
+
 params = {'zones': 'True',
-          'samples':'True'}
+          'samples':'True',
+          'route': 'True'}
 
 #Importing data from polar API
 exercise_data = requests.get(f'https://www.polaraccesslink.com/v3/exercises',
