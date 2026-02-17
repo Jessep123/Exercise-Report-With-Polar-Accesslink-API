@@ -52,6 +52,13 @@ data_processed['heart_rate_max'] = data_processed['heart_rate'].apply(lambda x: 
 #Removing old heart_rate dictionary column
 data_processed = data_processed.drop('heart_rate', axis = 1)
 
+#Extracting route data
+routes  = data_processed[['id', 'route']].copy()
+routes_final = routes.dropna()
+
+#Removing route column
+data_processed = data_processed.drop('route', axis = 1)
+
 #Processing training load data
 #Converting training load from object to dictionary dtype
 data_processed['training_load_pro'] = data_processed['training_load_pro'].apply(ast.literal_eval)
@@ -182,3 +189,27 @@ with engine.begin() as conn:
         """))
 
         conn.execute(text("DROP TABLE samples_stage;"))
+
+#Uploading routes table into neon
+with engine.begin() as conn:
+        
+        #Creating stage table with same schema as samples
+        conn.execute(text('CREATE TABLE routes_stage (LIKE routes INCLUDING DEFAULTS INCLUDING CONSTRAINTS);'))
+
+        routes_final.to_sql(
+        "routes_stage",
+        conn,
+        if_exists="append",
+        index=False,
+        method="multi",
+        chunksize=1000
+        )
+
+        conn.execute(text("""
+            INSERT INTO routes
+            SELECT *
+            FROM routes_stage
+            ON CONFLICT (id) DO NOTHING;
+        """))
+
+        conn.execute(text("DROP TABLE routes_stage;"))
