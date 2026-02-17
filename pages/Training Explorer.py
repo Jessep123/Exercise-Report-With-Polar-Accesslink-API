@@ -6,18 +6,18 @@ import matplotlib.pyplot as plt
 
 #Load data module
 from  streamlit_modules.load_data import load_data
+processed_data, hr_zones = load_data()
+
 
 #Plotting module
 import streamlit_modules.plots as plots
-
-processed_data, hr_zones = load_data()
 
 #Week_select automatically filters processed_data to the selected week
 from streamlit_modules.select_week import week_select 
 selected_week_data = week_select(processed_data)
 
 # week_summary, individual = st.tabs(["Week Overview", "Training Explorer"])
-individual, week_summary = st.tabs(["Training Explorer","Current Week Overview"])
+individual, week_summary = st.tabs(["Training Explorer","Weekly Overview"])
 
 #Current week overview code
 with week_summary:
@@ -63,8 +63,9 @@ with individual:
         line_graph.header('Heart Rate Over Activity', text_alignment= 'center')
 
         hr_graph = plots.activity_line_graph_hr(selected_dataframe)
-        # st.write(selected_activity)
         st.pyplot(hr_graph)
 
+    if selected_activity['has_route'] == 'True':
+        st.write(selected_activity)
 
    

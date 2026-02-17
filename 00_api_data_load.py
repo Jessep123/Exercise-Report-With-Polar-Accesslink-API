@@ -41,7 +41,6 @@ exercise_data = requests.get(f'https://www.polaraccesslink.com/v3/exercises',
 
 polar_data = pd.DataFrame(exercise_data)
 
-
 #Importing neon dataset
 from sqlalchemy import create_engine, text
 import psycopg2
@@ -49,7 +48,6 @@ from sqlalchemy import text
 
 
 engine = create_engine(neon_url)
-
 
 #SQL Query
 query = """

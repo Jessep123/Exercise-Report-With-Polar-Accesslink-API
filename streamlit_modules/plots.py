@@ -52,8 +52,6 @@ def visualize_zone_times(data):
 
     return fig
 
-
-
 def activity_line_graph_hr(data):
     import numpy as np
     import matplotlib.pyplot as plt
@@ -63,8 +61,8 @@ def activity_line_graph_hr(data):
     hr = data["hr"].iloc[0]
     hr = np.array(hr)
 
-    x = np.arange(len(hr))
-
+    x = range(len(hr))
+    
     # Create segments
     points = np.array([x, hr]).T.reshape(-1, 1, 2)
     segments = np.concatenate([points[:-1], points[1:]], axis=1)
@@ -86,25 +84,27 @@ def activity_line_graph_hr(data):
 
     fig, ax = plt.subplots()
 
+    #Plotting lines with line collection
     lc = LineCollection(segments, colors=colors, linewidth=1.5)
     ax.add_collection(lc)
 
-    
     #Formatting x axis
-    ax.set_xlim(x.min(), x.max())
-
-    # mins = math.ceil((len(hr)/60) / 15)
-
-    # ax.set_xticks([number * 1800 for number in range(mins + 1)])
-
-    # ax.set_xticklabels([number * 15 for number in range(mins + 1)])
-
+    mins = math.ceil((len(x)/60) / 15)
+    ax.set_xticks([number * 900 for number in range(mins + 1)])
+    ax.set_xticklabels([number * 15 for number in range(mins + 1)])
     ax.set_xlabel('Time (Mins)')
+    ax.set_xlim(x[0], x[-1])
+
+
+    ax.axhspan(0, 119, facecolor='grey', alpha=0.3, label='UT4')
+    ax.axhspan(119, 139, facecolor='lightblue', alpha=0.3, label='UT3')
+    ax.axhspan(139, 158, facecolor='lightgreen', alpha=0.3, label='UT2')
+    ax.axhspan(158, 179, facecolor='yellow', alpha=0.3, label='UT1')
+    ax.axhspan(179, 200, facecolor='red', alpha=0.3, label='AT')
 
     #Formatting y axis
     ax.set_ylim(hr.min(), 200)
     ax.set_ylabel('Heartrate (bpm)')
-
 
     return fig
 
