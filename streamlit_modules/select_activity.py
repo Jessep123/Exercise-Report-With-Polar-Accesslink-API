@@ -38,7 +38,7 @@ def activity_options_selectbox(data: pd.DataFrame):
 
     activity_id = activity_dic[selected_activity]
 
-    return data.loc[activity_id], data[data.index == activity_id]
+    return data.loc[activity_id], data[data.index == activity_id], activity_id
 
 
 def activity_summary(selected_activity: pd.DataFrame):   

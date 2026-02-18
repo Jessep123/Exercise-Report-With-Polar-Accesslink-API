@@ -191,6 +191,7 @@ with engine.begin() as conn:
         conn.execute(text("DROP TABLE samples_stage;"))
 
 #Uploading routes table into neon
+#Controlling for duplicates
 with engine.begin() as conn:
         
         #Creating stage table with same schema as samples

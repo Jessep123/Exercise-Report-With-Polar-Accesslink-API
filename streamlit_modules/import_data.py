@@ -43,4 +43,31 @@ def import_data():
     """
     hr_zones = pd.read_sql(text(zone_query), engine)
 
-    return processed_data, hr_zones
+   #Import route data
+    route_query = """
+    SELECT *
+    FROM routes
+    """
+    routes = pd.read_sql(text(route_query), engine, index_col = 'id')
+
+    return processed_data, hr_zones, routes
+
+def process_routes(data):
+    import ast
+    data_updated = data.copy()
+    data_updated['route'] = data['route'].apply(ast.literal_eval)
+
+    #Helper function to remove extra unneeded key,value pairs from route dictionary
+    def remove_extra(row):
+        row_adjusted = row
+        for value in row_adjusted:
+            for dic in value:
+                dic['time'] = float(dic['time'][2:-1])
+                del dic['satellites']
+                del dic['fix']
+        return row_adjusted
+    
+    #Applying remove extra function to each route 
+    data_updated = data_updated.apply(lambda x: remove_extra(x))
+
+    return data_updated

@@ -6,21 +6,29 @@ import matplotlib.pyplot as plt
 
 #Load data module
 from  streamlit_modules.load_data import load_data
-processed_data, hr_zones = load_data()
-
+processed_data, hr_zones, routes = load_data()
 
 #Plotting module
 import streamlit_modules.plots as plots
 
 #Week_select automatically filters processed_data to the selected week
 from streamlit_modules.select_week import week_select 
-selected_week_data = week_select(processed_data)
+
+
+
+
+#Sidebar definitions
+with st.sidebar:
+    selected_week_data = week_select(processed_data)
+
+
 
 # week_summary, individual = st.tabs(["Week Overview", "Training Explorer"])
 individual, week_summary = st.tabs(["Training Explorer","Weekly Overview"])
 
 #Current week overview code
 with week_summary:
+    st.session_state['active_tab'] = 'Week'
     #Plotting training zone proportions
     st.pyplot(plots.visualize_zone_times(selected_week_data))
     
@@ -43,12 +51,12 @@ with week_summary:
                     y = 'Count',
                     sort = False)
 
-with individual:
+with individual:    
     st.title('Individual Session Explorer')
 
     #Display formatted session title options
     from streamlit_modules.select_activity import activity_options_selectbox
-    selected_activity, selected_dataframe = activity_options_selectbox(selected_week_data)
+    selected_activity, selected_dataframe, activity_id = activity_options_selectbox(selected_week_data)
 
     #Summary statistics container
     stats = st.container(border = True)
@@ -66,6 +74,20 @@ with individual:
         st.pyplot(hr_graph)
 
     if selected_activity['has_route'] == 'True':
-        st.write(selected_activity)
+        map = st.container(border = True)
+        with map:
+            selected_route = routes[routes.index == activity_id].explode(column = 'route')
+
+            # selected_route['latitude'] = selected_route['route']['latitude']
+            selected_route = selected_route['route'].apply(pd.Series)
+
+            map_style = 'light'
+            st.map(selected_route, 
+                latitude = 'latitude', 
+                longitude = 'longitude',
+                size = 1)
+
+
+
 
    
