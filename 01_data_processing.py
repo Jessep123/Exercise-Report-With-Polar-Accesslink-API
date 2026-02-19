@@ -123,6 +123,7 @@ data_processed = data_processed.drop('samples', axis = 1)
 #Loading data_processing into neon
 #Controlling for duplicates
 with engine.begin() as conn:
+        from sqlalchemy import inspect
         data_processed.to_sql(
             "data_processed_stage",
             conn,
@@ -132,15 +133,23 @@ with engine.begin() as conn:
             chunksize=1000,
         )
 
-        conn.execute(text("""
-            INSERT INTO data_processed
-            SELECT *
+        insp = inspect(conn)
+
+        #Defining columns for import
+        target_cols = [c["name"] for c in insp.get_columns("data_processed")]
+        stage_cols  = [c["name"] for c in insp.get_columns("data_processed_stage")]
+
+        common_cols = [c for c in target_cols if c in stage_cols]
+
+        cols_csv = ", ".join(f'"{c}"' for c in common_cols)
+
+        conn.execute(text(f"""
+            INSERT INTO data_processed ({cols_csv})
+            SELECT {cols_csv}
             FROM data_processed_stage
-            ON CONFLICT (id) DO NOTHING;
+            ON CONFLICT ("id") DO NOTHING;
         """))
-
-        conn.execute(text("DROP TABLE data_processed_stage;"))
-
+        
 #Converting np array columns to python list to export
 array_cols = [
     'Altitude (m)',
