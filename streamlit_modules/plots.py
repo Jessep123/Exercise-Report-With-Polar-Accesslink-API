@@ -92,7 +92,7 @@ def activity_line_graph_hr(data):
     mins = math.ceil((len(x)/60) / 15)
     ax.set_xticks([number * 900 for number in range(mins + 1)])
     ax.set_xticklabels([number * 15 for number in range(mins + 1)])
-    ax.set_xlabel('Time (Mins)')
+    ax.set_xlabel('Time (Mins)', color='white')
     ax.set_xlim(x[0], x[-1])
 
 
@@ -104,7 +104,11 @@ def activity_line_graph_hr(data):
 
     #Formatting y axis
     ax.set_ylim(hr.min(), 200)
-    ax.set_ylabel('Heartrate (bpm)')
+    ax.tick_params(axis='both', colors='white')
+    ax.set_ylabel('Heartrate (bpm)', color='white')
+
+    fig.patch.set_facecolor('none')
+    ax.patch.set_facecolor(('white', 0.7))
 
     return fig
 
