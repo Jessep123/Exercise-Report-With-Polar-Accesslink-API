@@ -73,8 +73,14 @@ if len(new_data) != 0:
     #Converting columns to text for simplicities sake
     for col in new_data.columns:
         new_data[col] = new_data[col].where(new_data[col].isna(), new_data[col].astype(str))
+
+
+
         
     with engine.begin() as conn:
+
+        
+
         new_data.to_sql(
             "polar_data_stage",
             conn,
@@ -83,10 +89,21 @@ if len(new_data) != 0:
             method="multi",
             chunksize=1000,
         )
+        
+        from sqlalchemy import inspect
+        insp = inspect(conn)
 
-        conn.execute(text("""
-            INSERT INTO polar_data
-            SELECT *
+        #Defining columns for import
+        target_cols = [c["name"] for c in insp.get_columns("polar_data")]
+        stage_cols  = [c["name"] for c in insp.get_columns("polar_data_stage")]
+
+        common_cols = [c for c in target_cols if c in stage_cols]
+
+        cols_csv = ", ".join(f'"{c}"' for c in common_cols)
+
+        conn.execute(text(f"""
+            INSERT INTO polar_data ({cols_csv})
+            SELECT {cols_csv}
             FROM polar_data_stage
             ON CONFLICT (id) DO NOTHING;
         """))
