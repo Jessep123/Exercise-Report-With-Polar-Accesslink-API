@@ -22,33 +22,32 @@ def visualize_zone_times(data):
     
     fig, ax = plt.subplots()
 
-    #Function to display percentage and total values
-    def make_autopct(values):
-        def my_autopct(pct):
-            def convert_to_time(seconds):
+    #Function for converting total time in seconds to hour, min, seconds measure
+
+    def convert_to_time(seconds):
                 min, sec = divmod(seconds, 60)
                 hour, min = divmod(min, 60)
                 return '%d:%02d:%02d' % (hour, min, sec)
-            
-            total = sum(values)
-
-            val = int(round(pct*total/100.0))
-            
-            return '{p:.2f}% ({v})'.format(p=pct,v=convert_to_time(val))
-        return my_autopct
-
-    #Explode to space all wedges apart a bit more
-    explosion = [0.05 for value in range(len(filtered_values))]
 
     #Plotting  values
-    ax.pie(filtered_values, 
-           colors= [col_dic[key] for key in labels], 
-           autopct=make_autopct(filtered_values),
-           explode = explosion,
+    bar = ax.bar(labels,
+           filtered_values, 
+           color= [col_dic[key] for key in labels], 
+        #    autopct=make_autopct(filtered_values),
+        #    explode = explosion,
         #    shadow=True
         )
     
-    ax.legend(labels)
+
+    ax.tick_params(axis='both', colors='white')
+
+    ax.bar_label(bar, 
+                 fmt = lambda x: f'{convert_to_time(x)}',
+                 color = 'white')
+
+    fig.patch.set_facecolor('none')
+    ax.patch.set_facecolor(('none'))
+    # ax.legend(labels)
 
     return fig
 
@@ -108,7 +107,8 @@ def activity_line_graph_hr(data):
     ax.set_ylabel('Heartrate (bpm)', color='white')
 
     fig.patch.set_facecolor('none')
-    ax.patch.set_facecolor(('white', 0.7))
+    ax.patch.set_facecolor(('white', 0.6))
+
 
     return fig
 
