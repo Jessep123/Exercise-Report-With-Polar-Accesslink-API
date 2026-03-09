@@ -1,4 +1,4 @@
-
+#Function for processing heart rate zones data
 def add_zones(data, hr_zones):
        import pandas as pd
 

@@ -241,15 +241,15 @@ def activity_summary(selected_activity: pd.DataFrame):
         #Avergage heartrate tile
         col1_tile = row[0].container(height=120)
         col1_tile.markdown('#### Average HR', text_alignment  = 'center')
-        col1_tile.markdown(f':{hr_colour(selected_activity['heart_rate_avg'])}[{selected_activity['heart_rate_avg']}]', 
+        col1_tile.markdown(f":{hr_colour(selected_activity['heart_rate_avg'])}[{selected_activity['heart_rate_avg']}]", 
                            text_alignment= 'center')
         #Max heartrate tile
         col2_tile = row[1].container(height=120)
         col2_tile.markdown('#### Max HR', text_alignment  = 'center')
-        col2_tile.markdown(f':{hr_colour(selected_activity['heart_rate_max'])}[{selected_activity['heart_rate_max']}]', 
+        col2_tile.markdown(f":{hr_colour(selected_activity['heart_rate_max'])}[{selected_activity['heart_rate_max']}]", 
                            text_alignment= 'center')
         #Cardio load tile
         col3_tile = row[2].container(height=120)
         col3_tile.markdown('#### Cardio Load', text_alignment  = 'center')
-        col3_tile.markdown(f'{selected_activity['heart_rate_max']}', 
+        col3_tile.markdown(f"{selected_activity['heart_rate_max']}", 
                            text_alignment= 'center')
